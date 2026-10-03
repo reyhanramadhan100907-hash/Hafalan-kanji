@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kuis Kanji</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#faf8f4;--fg:#1f1d1a;--card:#fff;--mut:#7a746b;--ac:#c8372d;--ok:#2e7d4f;--bd:#e4ded3}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#171614;--fg:#f0ece4;--card:#232120;--mut:#a39d92;--ac:#ef6a5e;--ok:#5cb985;--bd:#38352f}}
+:root[data-theme="dark"]{--bg:#171614;--fg:#f0ece4;--card:#232120;--mut:#a39d92;--ac:#ef6a5e;--ok:#5cb985;--bd:#38352f}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:"Hiragino Sans","Noto Sans JP",system-ui,sans-serif}
+main{max-width:480px;margin:0 auto;padding:16px}
+.tabs{display:flex;gap:8px;margin-bottom:16px}
+button{font:inherit;color:inherit;background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:10px 14px;cursor:pointer}
+.tabs button{flex:1}.tabs .on{background:var(--ac);border-color:var(--ac);color:#fff}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:20px;text-align:center}
+.k{font-size:96px;line-height:1.1;margin:8px 0}
+.mut{color:var(--mut);font-size:14px}
+.opts{display:grid;gap:8px;margin-top:16px}
+.opts button{text-align:left}
+.ok{border-color:var(--ok)!important;background:color-mix(in srgb,var(--ok) 20%,var(--card))}
+.bad{border-color:var(--ac)!important;background:color-mix(in srgb,var(--ac) 20%,var(--card))}
+.pri{background:var(--ac);border-color:var(--ac);color:#fff;width:100%;margin-top:12px}
+input,textarea{font:inherit;color:inherit;background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:10px;width:100%;margin-bottom:8px}
+textarea{min-height:110px}
+.row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--bd);gap:8px}
+.row b{font-size:24px;margin-right:8px}
+.row button{padding:4px 10px}
+</style></head><body><main>
+<div class="tabs"><button id="t0" class="on">Kuis</button><button id="t1">Daftar</button></div>
+<div id="app"></div></main>
+<script>
+const D=[["一", "イチ・ひと(つ)", "satu"], ["二", "ニ・ふた(つ)", "dua"], ["九", "キュウ・ク・ここの(つ)", "sembilan"], ["七", "シチ・なな", "tujuh"], ["人", "ジン・ニン・ひと", "orang"], ["入", "ニュウ・い.る・はい.る", "masuk"], ["八", "ハチ・や(つ)", "delapan"], ["十", "ジュウ・とお", "sepuluh"], ["三", "サン・み(つ)", "tiga"], ["上", "ジョウ・うえ", "atas"], ["下", "カ・ゲ・した", "bawah"], ["大", "ダイ・タイ・おお.きい", "besar"], ["女", "ジョ・おんな", "wanita"], ["山", "サン・やま", "gunung"], ["川", "セン・かわ", "sungai"], ["土", "ド・ト・つち", "tanah"], ["千", "セン・ち", "ribu"], ["子", "シ・こ", "anak"], ["小", "ショウ・ちい.さい", "kecil"], ["中", "チュウ・なか", "tengah, dalam"], ["五", "ゴ・いつ(つ)", "lima"], ["六", "ロク・む(つ)", "enam"], ["円", "エン・まる.い", "yen, lingkaran"], ["天", "テン・あま", "surga"], ["日", "ニチ・ジツ・ひ", "hari, matahari"], ["月", "ゲツ・ガツ・つき", "bulan"], ["木", "モク・ボク・き", "pohon, kayu"], ["水", "スイ・みず", "air"], ["火", "カ・ひ", "api"], ["出", "シュツ・で.る・だ.す", "keluar"], ["右", "ウ・ユウ・みぎ", "kanan"], ["四", "シ・よん・よっ(つ)", "empat"], ["左", "サ・ひだり", "kiri"], ["本", "ホン・もと", "buku, pokok"], ["白", "ハク・しろ.い", "putih"], ["万", "マン・バン", "sepuluh ribu"], ["今", "コン・キン・いま", "sekarang"], ["午", "ゴ・うま", "tengah hari"], ["友", "ユウ・とも", "teman"], ["父", "フ・ちち", "ayah"], ["北", "ホク・きた", "utara"], ["半", "ハン・なか.ば", "setengah"], ["外", "ガイ・そと・ほか", "luar"], ["母", "ボ・はは", "ibu"], ["休", "キュウ・やす.む", "istirahat"], ["先", "セン・さき", "lebih dulu, depan"], ["名", "メイ・ミョウ・な", "nama"], ["年", "ネン・とし", "tahun"], ["気", "キ・ケ", "semangat, perasaan"], ["百", "ヒャク", "ratus"], ["男", "ダン・ナン・おとこ", "pria"], ["見", "ケン・み.る", "melihat"], ["車", "シャ・くるま", "mobil, kendaraan"], ["毎", "マイ", "setiap"], ["行", "コウ・ギョウ・い.く", "pergi"], ["西", "セイ・サイ・にし", "barat"], ["何", "カ・なに・なん", "apa"], ["来", "ライ・く.る", "datang"], ["学", "ガク・まな.ぶ", "belajar"], ["金", "キン・コン・かね", "emas, uang"], ["雨", "ウ・あめ", "hujan"], ["国", "コク・くに", "negara"], ["東", "トウ・ひがし", "timur"], ["長", "チョウ・なが.い", "panjang"], ["前", "ゼン・まえ", "depan, sebelum"], ["南", "ナン・みなみ", "selatan"], ["後", "ゴ・コウ・のち・うし.ろ", "belakang, sesudah"], ["食", "ショク・た.べる", "makan"], ["校", "コウ", "sekolah"], ["時", "ジ・とき", "waktu, jam"], ["高", "コウ・たか.い", "tinggi, mahal"], ["間", "カン・ケン・あいだ", "antara, ruang"], ["話", "ワ・はな.す", "berbicara, cerita"], ["電", "デン", "listrik"], ["聞", "ブン・モン・き.く", "mendengar"], ["語", "ゴ・かた.る", "bahasa"], ["読", "ドク・よ.む", "membaca"], ["生", "セイ・ショウ・い.きる・う.まれる", "hidup, lahir"], ["書", "ショ・か.く", "menulis"], ["力", "リョク・リキ・ちから", "kekuatan"], ["口", "コウ・ク・くち", "mulut"], ["工", "コウ・ク", "pertukangan, pembangunan"], ["夕", "セキ・ゆう", "sore"], ["手", "シュ・て", "tangan"], ["文", "ブン・モン・ふみ", "tulisan, kalimat"], ["犬", "ケン・いぬ", "anjing"], ["正", "セイ・ショウ・ただ.しい", "benar"], ["田", "デン・た", "sawah"], ["目", "モク・め", "mata"], ["立", "リツ・た.つ", "berdiri"], ["元", "ゲン・ガン・もと", "sumber, semula"], ["公", "コウ・おおやけ", "umum, publik"], ["切", "セツ・き.る", "memotong"], ["少", "ショウ・すく.ない・すこ.し", "sedikit"], ["心", "シン・こころ", "hati, jiwa"], ["方", "ホウ・かた", "arah, cara"], ["牛", "ギュウ・うし", "sapi"], ["止", "シ・と.まる", "berhenti"], ["兄", "ケイ・あに", "kakak laki-laki"], ["冬", "トウ・ふゆ", "musim dingin"], ["古", "コ・ふる.い", "lama, kuno"], ["台", "ダイ・タイ", "landasan, meja"], ["広", "コウ・ひろ.い", "luas"], ["用", "ヨウ・もち.いる", "menggunakan, keperluan"], ["世", "セイ・セ・よ", "dunia, generasi"], ["主", "シュ・ぬし・おも", "utama, tuan"], ["代", "ダイ・か.わる", "menggantikan, zaman"], ["写", "シャ・うつ.す", "menyalin, memotret"], ["去", "キョ・コ・さ.る", "pergi, lampau"], ["字", "ジ・あざ", "huruf"], ["早", "ソウ・はや.い", "awal, cepat"], ["町", "チョウ・まち", "kota kecil"], ["花", "カ・はな", "bunga"], ["赤", "セキ・あか", "merah"], ["足", "ソク・あし", "kaki"], ["不", "フ・ブ", "tidak, non-"], ["仕", "シ・つか.える", "melayani, bekerja"], ["会", "カイ・あ.う", "bertemu"], ["同", "ドウ・おな.じ", "sama"], ["多", "タ・おお.い", "banyak"], ["考", "コウ・かんが.える", "memikirkan, mempertimbangkan"], ["肉", "ニク", "daging"], ["自", "ジ・シ・みずか.ら", "diri sendiri"], ["色", "ショク・いろ", "warna"], ["体", "タイ・からだ", "tubuh"], ["作", "サク・つく.る", "membuat"], ["図", "ズ・ト", "gambar, peta"], ["売", "バイ・う.る", "menjual"], ["弟", "テイ・おとうと", "adik laki-laki"], ["社", "シャ・やしろ", "perusahaan, kuil"], ["言", "ゲン・ゴン・い.う", "berkata"], ["走", "ソウ・はし.る", "berlari"], ["近", "キン・ちか.い", "dekat"], ["空", "クウ・そら・から", "angkasa, kosong"], ["青", "セイ・あお", "biru"], ["音", "オン・おと", "suara"], ["地", "チ・ジ", "bumi, lahan"], ["安", "アン・やす.い", "murah, tenteram"], ["有", "ユウ・ウ・あ.る", "ada, memiliki"], ["死", "シ・し.ぬ", "mati"], ["京", "キョウ・ケイ・みやこ", "ibu kota"], ["夜", "ヤ・よる", "malam"], ["妹", "マイ・いもうと", "adik perempuan"], ["姉", "シ・あね", "kakak perempuan"], ["店", "テン・みせ", "toko"], ["明", "メイ・あか.るい", "terang"], ["歩", "ホ・ある.く", "berjalan"], ["画", "ガ・カク", "gambar, lukisan"], ["知", "チ・し.る", "tahu"], ["室", "シツ・むろ", "ruangan"], ["思", "シ・おも.う", "merasa, mengira"], ["海", "カイ・うみ", "laut"], ["茶", "チャ・サ", "teh"], ["以", "イ", "sejak, dengan"], ["夏", "カ・なつ", "musim panas"], ["家", "カ・ケ・いえ・うち", "rumah"], ["紙", "シ・かみ", "kertas"], ["通", "ツウ・とお.る・かよ.う", "melewati, pulang-pergi"], ["強", "キョウ・つよ.い", "kuat"], ["教", "キョウ・おし.える", "mengajar"], ["理", "リ", "logika, alasan"], ["週", "シュウ", "minggu"], ["魚", "ギョ・さかな・うお", "ikan"], ["鳥", "チョウ・とり", "burung"], ["黒", "コク・くろ", "hitam"], ["住", "ジュウ・す.む", "tinggal"], ["医", "イ", "kedokteran, dokter"], ["究", "キュウ・きわ.める", "meneliti"], ["者", "シャ・もの", "orang (pelaku)"], ["研", "ケン・と.ぐ", "mengasah, meneliti"], ["場", "ジョウ・ば", "tempat"], ["朝", "チョウ・あさ", "pagi"], ["答", "トウ・こた.える", "jawaban"], ["買", "バイ・か.う", "membeli"], ["道", "ドウ・みち", "jalan"], ["楽", "ガク・ラク・たの.しい", "menyenangkan, musik"], ["事", "ジ・こと", "hal, urusan"], ["使", "シ・つか.う", "menggunakan, menyuruh"], ["始", "シ・はじ.める", "memulai"], ["服", "フク", "pakaian"], ["物", "ブツ・モツ・もの", "benda"], ["屋", "オク・や", "toko, atap"], ["度", "ド・たび", "kali, derajat"], ["待", "タイ・ま.つ", "menunggu"], ["持", "ジ・も.つ", "memegang, membawa"], ["界", "カイ", "batas, lingkup"], ["発", "ハツ", "berangkat, memancarkan"], ["送", "ソウ・おく.る", "mengirim"], ["重", "ジュウ・おも.い", "berat"], ["起", "キ・お.きる", "bangun, terjadi"]];
+let cards,del_=[],tab=0,q=null,score=[0,0],last=null,msg="";
+function load(){let s=[],x=[];try{const j=JSON.parse(localStorage.getItem("kanji-cards"));if(Array.isArray(j))s=j;else if(j){s=j.c||[];x=j.x||[]}}catch(e){}
+const m={};s.forEach(c=>m[c.k]=c);del_=x;
+const o=D.filter(d=>!x.includes(d[0])).map(([k,y,a])=>({k,y,a,w:(m[k]&&m[k].w)||0}));
+s.forEach(c=>{if(!D.some(d=>d[0]===c.k))o.push(c)});return o}
+function save(){try{localStorage.setItem("kanji-cards",JSON.stringify({c:cards,x:del_}))}catch(e){}}
+cards=load();
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const shuf=a=>a.map(x=>[Math.random(),x]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]);
+function next(){
+  const pool=cards.filter(c=>c!==last||cards.length<2);
+  const tot=pool.reduce((s,c)=>s+1+c.w,0);let r=Math.random()*tot,c=pool[0];
+  for(const x of pool){r-=1+x.w;if(r<=0){c=x;break}}
+  last=c;
+  const others=shuf(cards.filter(x=>x!==c&&x.a!==c.a)).slice(0,3);
+  q={c,opts:shuf([c,...others]),ans:null};
+}
+function render(){
+  $("t0").className=tab==0?"on":"";$("t1").className=tab==1?"on":"";
+  const app=$("app");
+  if(tab==0){
+    if(!cards.length){app.innerHTML='<p class="mut">Belum ada kanji. Tambahkan di tab Daftar.</p>';return}
+    if(!q||!cards.includes(q.c))next();
+    app.innerHTML=`<div class="card"><div class="mut">Benar ${score[0]} / ${score[1]}</div><div class="k">${esc(q.c.k)}</div>
+    <div class="mut">${q.ans!==null?esc(q.c.y):"Apa artinya?"}</div></div><div class="opts">${q.opts.map((o,i)=>`<button data-i="${i}" class="${q.ans!==null?(o===q.c?"ok":(i===q.ans?"bad":"")):""}">${esc(o.a)}</button>`).join("")}</div>
+    ${q.ans!==null?'<button class="pri" id="nx">Lanjut</button>':""}`;
+    app.querySelectorAll("[data-i]").forEach(b=>b.onclick=()=>{
+      if(q.ans!==null)return;const i=+b.dataset.i;q.ans=i;score[1]++;
+      if(q.opts[i]===q.c){score[0]++;q.c.w=Math.max(0,q.c.w-1)}else q.c.w+=2;
+      save();render()});
+    if(q.ans!==null)$("nx").onclick=()=>{next();render()};
+  }else{
+    app.innerHTML=`<p class="mut">Satu kanji per baris, format: <b>kanji | bacaan | arti</b></p>
+    <textarea id="bulk" placeholder="学 | ガク・まなぶ | belajar"></textarea>
+    <div style="display:flex;gap:8px"><button class="pri" id="add" style="margin:0">Tambah</button><button id="exp">Ekspor ke kotak</button></div>
+    <p class="mut">${esc(msg)}</p><div>${cards.map((c,i)=>`<div class="row"><span><b>${esc(c.k)}</b>${esc(c.y)} · ${esc(c.a)}</span><button data-d="${i}">✕</button></div>`).join("")}</div>`;
+    $("add").onclick=()=>{
+      let n=0;
+      $("bulk").value.split("\n").forEach(l=>{
+        const p=l.split("|").map(s=>s.trim());
+        if(p.length>=3&&p[0]&&p[2]&&!cards.some(c=>c.k===p[0])){cards.push({k:p[0],y:p[1],a:p.slice(2).join(" | "),w:0});n++}});
+      save();msg=n?`${n} kanji ditambahkan.`:"Tidak ada kanji baru (cek format atau duplikat).";render()};
+    $("exp").onclick=()=>{$("bulk").value=cards.map(c=>`${c.k} | ${c.y} | ${c.a}`).join("\n")};
+    app.querySelectorAll("[data-d]").forEach(b=>b.onclick=()=>{{const k=cards[+b.dataset.d].k;if(D.some(d=>d[0]===k)&&!del_.includes(k))del_.push(k);cards.splice(+b.dataset.d,1)}save();q=null;msg="";render()});
+  }
+}
+$("t0").onclick=()=>{tab=0;render()};$("t1").onclick=()=>{tab=1;render()};
+render();
+</script></body></html>
