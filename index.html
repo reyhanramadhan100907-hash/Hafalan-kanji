@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kuis Kanji</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#faf8f4;--fg:#1f1d1a;--card:#fff;--mut:#7a746b;--ac:#c8372d;--ok:#2e7d4f;--bd:#e4ded3}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#171614;--fg:#f0ece4;--card:#232120;--mut:#a39d92;--ac:#ef6a5e;--ok:#5cb985;--bd:#38352f}}
+:root[data-theme="dark"]{--bg:#171614;--fg:#f0ece4;--card:#232120;--mut:#a39d92;--ac:#ef6a5e;--ok:#5cb985;--bd:#38352f}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:"Hiragino Sans","Noto Sans JP",system-ui,sans-serif}
+main{max-width:480px;margin:0 auto;padding:16px}
+.tabs{display:flex;gap:8px;margin-bottom:16px}
+button{font:inherit;color:inherit;background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:10px 14px;cursor:pointer}
+.tabs button{flex:1}.tabs .on{background:var(--ac);border-color:var(--ac);color:#fff}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:20px;text-align:center}
+.k{font-size:96px;line-height:1.1;margin:8px 0}
+.mut{color:var(--mut);font-size:14px}
+.opts{display:grid;gap:8px;margin-top:16px}
+.opts button{text-align:left}
+.ok{border-color:var(--ok)!important;background:color-mix(in srgb,var(--ok) 20%,var(--card))}
+.bad{border-color:var(--ac)!important;background:color-mix(in srgb,var(--ac) 20%,var(--card))}
+.pri{background:var(--ac);border-color:var(--ac);color:#fff;width:100%;margin-top:12px}
+input,textarea{font:inherit;color:inherit;background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:10px;width:100%;margin-bottom:8px}
+textarea{min-height:110px}
+.row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--bd);gap:8px}
+.row b{font-size:24px;margin-right:8px}
+.row button{padding:4px 10px}
+</style></head><body><main>
+<div class="tabs"><button id="t0" class="on">Kuis</button><button id="t1">Daftar</button></div>
+<div id="app"></div></main>
+<script>
+const D=[["日","ニチ・ジツ・ひ","hari, matahari"],["月","ゲツ・つき","bulan"],["火","カ・ひ","api"],["水","スイ・みず","air"],["木","モク・き","pohon, kayu"],["金","キン・かね","emas, uang"],["土","ド・つち","tanah"],["人","ジン・ひと","orang"]];
+let cards,tab=0,q=null,score=[0,0],last=null,msg="";
+function load(){try{const s=localStorage.getItem("kanji-cards");if(s){const a=JSON.parse(s);if(Array.isArray(a)&&a.length)return a}}catch(e){}return D.map(([k,y,a])=>({k,y,a,w:0}))}
+function save(){try{localStorage.setItem("kanji-cards",JSON.stringify(cards))}catch(e){}}
+cards=load();
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const shuf=a=>a.map(x=>[Math.random(),x]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]);
+function next(){
+  const pool=cards.filter(c=>c!==last||cards.length<2);
+  const tot=pool.reduce((s,c)=>s+1+c.w,0);let r=Math.random()*tot,c=pool[0];
+  for(const x of pool){r-=1+x.w;if(r<=0){c=x;break}}
+  last=c;
+  const others=shuf(cards.filter(x=>x!==c&&x.a!==c.a)).slice(0,3);
+  q={c,opts:shuf([c,...others]),ans:null};
+}
+function render(){
+  $("t0").className=tab==0?"on":"";$("t1").className=tab==1?"on":"";
+  const app=$("app");
+  if(tab==0){
+    if(!q||!cards.includes(q.c))next();
+    app.innerHTML=`<div class="card"><div class="mut">Benar ${score[0]} / ${score[1]}</div><div class="k">${esc(q.c.k)}</div>
+    <div class="mut">${q.ans!==null?esc(q.c.y):"Apa artinya?"}</div></div><div class="opts">${q.opts.map((o,i)=>`<button data-i="${i}" class="${q.ans!==null?(o===q.c?"ok":(i===q.ans?"bad":"")):""}">${esc(o.a)}</button>`).join("")}</div>
+    ${q.ans!==null?'<button class="pri" id="nx">Lanjut</button>':""}`;
+    app.querySelectorAll("[data-i]").forEach(b=>b.onclick=()=>{
+      if(q.ans!==null)return;const i=+b.dataset.i;q.ans=i;score[1]++;
+      if(q.opts[i]===q.c){score[0]++;q.c.w=Math.max(0,q.c.w-1)}else q.c.w+=2;
+      save();render()});
+    if(q.ans!==null)$("nx").onclick=()=>{next();render()};
+  }else{
+    app.innerHTML=`<p class="mut">Satu kanji per baris, format: <b>kanji | bacaan | arti</b></p>
+    <textarea id="bulk" placeholder="学 | ガク・まなぶ | belajar"></textarea>
+    <div style="display:flex;gap:8px"><button class="pri" id="add" style="margin:0">Tambah</button><button id="exp">Ekspor ke kotak</button></div>
+    <p class="mut">${esc(msg)}</p><div>${cards.map((c,i)=>`<div class="row"><span><b>${esc(c.k)}</b>${esc(c.y)} · ${esc(c.a)}</span><button data-d="${i}">✕</button></div>`).join("")}</div>`;
+    $("add").onclick=()=>{
+      let n=0;
+      $("bulk").value.split("\n").forEach(l=>{
+        const p=l.split("|").map(s=>s.trim());
+        if(p.length>=3&&p[0]&&p[2]&&!cards.some(c=>c.k===p[0])){cards.push({k:p[0],y:p[1],a:p.slice(2).join(" | "),w:0});n++}});
+      save();msg=n?`${n} kanji ditambahkan.`:"Tidak ada kanji baru (cek format atau duplikat).";render()};
+    $("exp").onclick=()=>{$("bulk").value=cards.map(c=>`${c.k} | ${c.y} | ${c.a}`).join("\n")};
+    app.querySelectorAll("[data-d]").forEach(b=>b.onclick=()=>{cards.splice(+b.dataset.d,1);save();q=null;msg="";render()});
+  }
+}
+$("t0").onclick=()=>{tab=0;render()};$("t1").onclick=()=>{tab=1;render()};
+render();
+</script></body></html>
